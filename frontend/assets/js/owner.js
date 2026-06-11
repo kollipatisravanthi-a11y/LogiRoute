@@ -1,4 +1,4 @@
-﻿function renderOwner() {
+function renderOwner() {
   const nav = ["Dashboard", "Fleet Management", "Package Manager", "Route Planner", "Algorithm Control", "Analytics", "Incident Reports"];
   app.innerHTML = `
     <section class="app-shell">
@@ -50,7 +50,7 @@ function dashboardPage() {
     </div>
     ${state.trucks.length ? `
       <div class="dashboard-grid">
-        <section class="card map-panel"><div class="panel-title"><h3>Operations Map</h3><span class="muted">Owner-created fleet only</span></div><div class="map-canvas"><canvas id="ownerMap"></canvas></div></section>
+        <section class="card map-panel"><div class="panel-title"><h3>Operations Map</h3><span class="muted">Bangalore roads</span></div><div id="blrMap" class="map-canvas"></div></section>
         <div class="side-stack">
           <section class="card"><div class="panel-title"><h3>Fleet Status</h3><button class="btn" onclick="routeTo('owner','Fleet Management')">Manage</button></div>${fleetMinis()}</section>
           <section class="card"><div class="panel-title"><h3>Incidents</h3><button class="btn" onclick="createIncident()">Simulate</button></div>${incidentList(4)}</section>
@@ -106,21 +106,22 @@ function truckRow(truck) {
   return `
     <tr>
       <td>${truck.id}</td><td>${truck.driver}</td><td>${truck.mobile}<br><span class="muted">${truck.email}</span></td><td>${truck.vehicleType}</td><td>${truck.plate}</td>
-      <td>${truck.capacity} kg</td><td>${truck.fuel}%</td><td><span class="pill green">${truck.status}</span></td>
+      <td>${truck.capacity} kg</td><td>${truck.fuel}%</td><td><span class="pill" style="background:${statusColor(truck.status)};color:#fff;">${truck.status}</span></td>
       <td><div class="action-row"><button class="btn" onclick="selectTruck('${truck.id}')">View</button><button class="btn danger" onclick="removeTruck('${truck.id}')">Delete</button></div></td>
     </tr>`;
 }
 
-function addTruck(event) {
+async function addTruck(event) {
   event.preventDefault();
   const id = document.getElementById("truckId").value.trim();
   if (state.trucks.some(truck => truck.id.toLowerCase() === id.toLowerCase())) {
-    alert("Truck ID already exists.");
+    notify("Truck ID already exists.", "error");
     return;
   }
   const startNode = Number(document.getElementById("startNode").value);
   const start = state.nodes[startNode];
-  state.trucks.push({
+
+  const payload = {
     id,
     plate: document.getElementById("plate").value.trim(),
     driver: document.getElementById("driverName").value.trim(),
@@ -129,7 +130,7 @@ function addTruck(event) {
     vehicleType: document.getElementById("vehicleType").value,
     capacity: Number(document.getElementById("capacity").value),
     fuel: Number(document.getElementById("fuel").value),
-    status: "Active",
+    startNode,
     packages: [],
     route: [startNode],
     routeNames: [start.name],
@@ -137,23 +138,49 @@ function addTruck(event) {
     segment: 0,
     completedStops: 0,
     pos: { x: start.x, y: start.y },
-    color: LR_COLORS[state.trucks.length % LR_COLORS.length]
-  });
-  runOptimization();
-  render();
+    color: LR_COLORS[state.trucks.length % LR_COLORS.length],
+    status: "Available"
+  };
+
+  if (!state.backendConnected || typeof apiJson !== "function") {
+    state.trucks.push(payload);
+    runOptimization();
+    render();
+    return;
+  }
+
+  try {
+    const created = await apiJson("/api/trucks", { method: "POST", body: payload });
+    state.trucks.push(hydrateTruckFromApi(created, state.trucks.length));
+    runOptimization();
+    render();
+  } catch (e) {
+    notify(e?.message || "Failed to add truck", "error");
+  }
 }
 
-function removeTruck(id) {
-  state.trucks = state.trucks.filter(truck => truck.id !== id);
-  state.packages.forEach(pkg => {
-    if (pkg.truckId === id) {
-      pkg.truckId = "";
-      pkg.status = "Pending";
-      pkg.eta = "";
-    }
-  });
-  runOptimization();
-  render();
+async function removeTruck(id) {
+  if (!state.backendConnected || typeof apiJson !== "function") {
+    state.trucks = state.trucks.filter(truck => truck.id !== id);
+    state.packages.forEach(pkg => {
+      if (pkg.truckId === id) {
+        pkg.truckId = "";
+        pkg.status = "Pending";
+        pkg.eta = "";
+      }
+    });
+    runOptimization();
+    render();
+    return;
+  }
+
+  try {
+    await apiJson(`/api/trucks/${encodeURIComponent(id)}`, { method: "DELETE" });
+    await refreshFromBackend();
+    render();
+  } catch (e) {
+    notify(e?.message || "Failed to remove truck", "error");
+  }
 }
 
 function selectTruck(id) {
@@ -211,13 +238,13 @@ function packageRow(pkg) {
     </tr>`;
 }
 
-function savePackage(event) {
+async function savePackage(event) {
   event.preventDefault();
   const node = Number(document.getElementById("pkgNode").value);
   const id = document.getElementById("pkgId").value.trim();
   const existing = state.packages.find(pkg => pkg.id === id);
   if (!state.editingPackageId && existing) {
-    alert("Package ID already exists.");
+    notify("Package ID already exists.", "error");
     return;
   }
   const payload = {
@@ -238,6 +265,22 @@ function savePackage(event) {
     dependsOn: existing ? existing.dependsOn : [],
     instructions: document.getElementById("pkgInstructions").value.trim()
   };
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      if (existing) {
+        await apiJson(`/api/packages/${encodeURIComponent(id)}`, { method: "PATCH", body: payload });
+      } else {
+        await apiJson("/api/packages", { method: "POST", body: payload });
+      }
+      await refreshFromBackend();
+      state.editingPackageId = null;
+      runOptimization();
+    } catch (e) {
+      notify(e?.message || "Failed to save package", "error");
+    }
+    return;
+  }
+
   if (existing) Object.assign(existing, payload);
   else state.packages.push(payload);
   state.editingPackageId = null;
@@ -249,8 +292,21 @@ function editPackage(id) {
   render();
 }
 
-function deletePackage(id) {
+async function deletePackage(id) {
   if (!confirm("Delete this package from today's operation?")) return;
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      await apiJson(`/api/packages/${encodeURIComponent(id)}`, { method: "DELETE" });
+      await refreshFromBackend();
+      state.editingPackageId = null;
+      runOptimization();
+      return;
+    } catch (e) {
+      notify(e?.message || "Failed to delete package", "error");
+      return;
+    }
+  }
+
   state.packages = state.packages.filter(pkg => pkg.id !== id);
   state.trucks.forEach(truck => {
     truck.packages = truck.packages.filter(pkg => pkg.id !== id);
@@ -268,7 +324,7 @@ function resetPackageForm() {
 function routePlannerPage() {
   return `
     <div class="page-head"><div><h2>Route Planner</h2><div class="muted">Routes can be generated only for vehicles added by the owner.</div></div><button class="btn primary" onclick="runOptimization()">Generate Optimal Routes</button></div>
-    ${state.trucks.length ? `<div class="dashboard-grid"><section class="card map-panel"><div class="panel-title"><h3>Planned Routes</h3><span class="muted">${state.tspMode}</span></div><div class="map-canvas"><canvas id="ownerMap"></canvas></div></section><section class="card"><div class="panel-title"><h3>Route Summary</h3></div>${fleetMinis()}</section></div>` : emptyFleetNotice()}`;
+    ${state.trucks.length ? `<div class="dashboard-grid"><section class="card map-panel"><div class="panel-title"><h3>Planned Routes</h3><span class="muted">${state.tspMode} on Bangalore roads</span></div><div id="blrMap" class="map-canvas"></div></section><section class="card"><div class="panel-title"><h3>Route Summary</h3></div>${fleetMinis()}</section></div>` : emptyFleetNotice()}`;
 }
 
 function algorithmPage() {
@@ -296,10 +352,24 @@ function analyticsPage() {
 function incidentsPage() {
   return `
     <div class="page-head"><div><h2>Incident Reports</h2><div class="muted">Incidents use owner-added truck IDs when vehicles are available.</div></div><button class="btn primary" onclick="createIncident()">Simulate Incident</button></div>
-    <section class="card">${incidentList(20)}</section>`;
+    <section class="card" style="padding:16px">
+      <form class="form-grid" onsubmit="submitIncident(event)">
+        <label class="field">Type<select id="incidentType"><option>Accident</option><option>Road Block</option><option>Delayed Package</option><option>Truck Stationary</option></select></label>
+        <label class="field">Truck ID<select id="incidentTruck"><option value="">No truck</option>${state.trucks.map(truck => `<option>${truck.id}</option>`).join("")}</select></label>
+        <label class="field full">Message<textarea id="incidentMessage" class="textarea" placeholder="Describe the incident"></textarea></label>
+        <button class="btn primary full">Report Incident</button>
+      </form>
+    </section>
+    <section class="card" style="margin-top:18px">${incidentList(20)}</section>`;
 }
 
 function runOptimization() {
+  const before = new Map(state.packages.map(pkg => [pkg.id, {
+    truckId: pkg.truckId || "",
+    eta: pkg.eta || "",
+    status: pkg.status || "Pending"
+  }]));
+
   state.packages.forEach(pkg => {
     if (pkg.status !== "Delivered" && pkg.status !== "Failed") {
       pkg.status = "Pending";
@@ -313,12 +383,18 @@ function runOptimization() {
     truck.route = [current];
     truck.routeNames = [state.nodes[current].name];
     truck.completedStops = 0;
+    if (truck.status !== "Completed" && truck.status !== "Returned") truck.status = "Active";
   });
   if (!state.trucks.length) {
     drawVisibleCanvases();
     return;
   }
-  const unassigned = state.packages.filter(pkg => pkg.status !== "Delivered" && pkg.status !== "Failed").slice().sort((a, b) => (b.priority === "Urgent") - (a.priority === "Urgent"));
+
+  const unassigned = state.packages
+    .filter(pkg => pkg.status !== "Delivered" && pkg.status !== "Failed")
+    .slice()
+    .sort((a, b) => (b.priority === "Urgent") - (a.priority === "Urgent"));
+
   state.trucks.forEach(truck => {
     const { selected } = knapsack(unassigned, truck.capacity, state.priorityWeight);
     truck.packages = selected;
@@ -340,6 +416,36 @@ function runOptimization() {
       pkg.eta = lrTimeFromMinutes(110 + stopIndex * 26);
     });
   });
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    (async () => {
+      const updates = [];
+      for (const pkg of state.packages) {
+        const prev = before.get(pkg.id);
+        if (!prev) continue;
+
+        const truckChanged = (prev.truckId || "") !== (pkg.truckId || "");
+        const etaChanged = (prev.eta || "") !== (pkg.eta || "");
+        const statusChanged = (prev.status || "") !== (pkg.status || "");
+        if (!truckChanged && !etaChanged && !statusChanged) continue;
+
+        updates.push({
+          id: pkg.id,
+          truckId: pkg.truckId || "",
+          eta: pkg.eta || "",
+          status: pkg.status || "Pending"
+        });
+      }
+
+      if (!updates.length) return;
+      try {
+        await apiJson("/api/packages/bulk", { method: "PATCH", body: { updates } });
+      } catch {
+        notify("Route plan saved locally, but backend sync failed.", "error");
+      }
+    })();
+  }
+
   render();
 }
 
@@ -362,28 +468,114 @@ function incidentList(limit) {
       <b>${incident.type}</b>
       <div>${incident.description}</div>
       <div class="muted">${incident.target} - ${incident.time} - ${incident.resolved ? "Resolved" : "Open"}</div>
-      ${incident.resolved ? "" : `<button class="btn" onclick="resolveIncident(${incident.id})">Mark Resolved</button>`}
+      ${incident.resolved ? "" : `<button class="btn" onclick="resolveIncident('${String(incident.id).replaceAll("'", "\\'")}')">Mark Resolved</button>`}
     </div>`).join("");
 }
 
-function createIncident() {
+async function createIncident() {
   const type = lrChoice(["Road Block", "Delayed Package", "Truck Stationary"]);
   const truck = state.trucks.length ? lrChoice(state.trucks) : null;
   const pkg = lrChoice(state.packages);
+
+  const target = type === "Delayed Package" ? pkg.id : truck ? truck.id : "";
+  const description = type === "Road Block"
+    ? "Road blockage reported near " + lrChoice(LR_AREAS.slice(1))
+    : type === "Delayed Package"
+      ? pkg.id + " may miss its delivery window"
+      : (truck ? truck.id : "A planned vehicle") + " has been stationary too long";
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      const created = await apiJson("/api/incidents", {
+        method: "POST",
+        body: { truckId: type === "Delayed Package" ? "" : (truck ? truck.id : ""), type, message: description }
+      });
+      state.incidents.unshift(mapIncidentFromApi(created));
+      render();
+      return;
+    } catch (e) {
+      notify(e?.message || "Failed to create incident", "error");
+      return;
+    }
+  }
+
   state.incidents.unshift({
     id: Date.now(),
     type,
-    target: type === "Delayed Package" ? pkg.id : truck ? truck.id : "No truck assigned",
-    description: type === "Road Block" ? "Road blockage reported near " + lrChoice(LR_AREAS.slice(1)) : type === "Delayed Package" ? pkg.id + " may miss its delivery window" : (truck ? truck.id : "A planned vehicle") + " has been stationary too long",
+    target,
+    description,
     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     resolved: false
   });
   render();
 }
 
-function resolveIncident(id) {
-  const incident = state.incidents.find(item => item.id === id);
-  if (incident) incident.resolved = true;
+async function submitIncident(event) {
+  event.preventDefault();
+
+  const type = (document.getElementById("incidentType")?.value || "Accident").trim() || "Accident";
+  const truckId = (document.getElementById("incidentTruck")?.value || "").trim();
+  const messageRaw = (document.getElementById("incidentMessage")?.value || "").trim();
+
+  const fallback = type === "Accident"
+    ? "Accident reported"
+    : type === "Road Block"
+      ? "Road blockage reported"
+      : "Incident reported";
+  const message = messageRaw || (truckId ? `${fallback} for ${truckId}.` : `${fallback}.`);
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      const created = await apiJson("/api/incidents", { method: "POST", body: { truckId, type, message } });
+      state.incidents.unshift(mapIncidentFromApi(created));
+      render();
+    } catch (e) {
+      notify(e?.message || "Failed to submit incident", "error");
+    }
+    return;
+  }
+
+  state.incidents.unshift({
+    id: Date.now(),
+    type,
+    target: truckId || "",
+    description: message,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    resolved: false
+  });
   render();
 }
 
+async function resolveIncident(id) {
+  const incident = state.incidents.find(item => String(item.id) === String(id));
+  if (!incident) return;
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      const resolved = await apiJson(`/api/incidents/${encodeURIComponent(String(id))}/resolve`, { method: "POST" });
+      Object.assign(incident, mapIncidentFromApi(resolved));
+      render();
+      return;
+    } catch (e) {
+      notify(e?.message || "Failed to resolve incident", "error");
+      return;
+    }
+  }
+
+  incident.resolved = true;
+  render();
+}
+
+function statusColor(status) {
+  switch (status) {
+    case "In Transit":
+      return "#1e90ff";
+    case "Completed":
+      return "#800080";
+    case "Available":
+    case "Idle":
+    case "Active":
+    default:
+      return "#28a745";
+  }
+}

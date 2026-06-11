@@ -1,0 +1,1044 @@
+{
+  "meta": {
+    "version": 1,
+    "createdAt": "2026-05-08T06:01:50.963Z",
+    "seededAt": "2026-05-08T06:01:51.034Z",
+    "updatedAt": "2026-06-11T14:21:13.535Z"
+  },
+  "users": [
+    {
+      "id": "owner@logiroute.in",
+      "role": "owner",
+      "name": "Demo Owner",
+      "passwordHash": "$2a$10$62tKIwySwemSt5I2cH4sw.nSfWwiThldarkjQi4qHXmOHEakEtpJa",
+      "createdAt": "2026-05-15T04:24:13.816Z"
+    },
+    {
+      "id": "customer@logiroute.in",
+      "role": "customer",
+      "name": "Demo Customer",
+      "passwordHash": "$2a$10$rDUXDYDetaMLudt2zl95YekqsI51NjmB2zwcm1s5J9QZd2DaiXdDu",
+      "createdAt": "2026-05-15T04:24:13.816Z"
+    },
+    {
+      "id": "cust915165@example.com",
+      "role": "customer",
+      "name": "Test User",
+      "passwordHash": "$2a$10$N.lVER6/mpclm9/cyb2zZ.M8PV9KJkw0.YdGDJnhM7Oft7gHzHbgm",
+      "createdAt": "2026-05-15T04:27:02.841Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": 0,
+      "name": "Central Warehouse",
+      "x": 96,
+      "y": 92
+    },
+    {
+      "id": 1,
+      "name": "Koramangala",
+      "x": 168.63258462762946,
+      "y": 532.5367652896874
+    },
+    {
+      "id": 2,
+      "name": "Indiranagar",
+      "x": 424.8504531364301,
+      "y": 297.41525916346035
+    },
+    {
+      "id": 3,
+      "name": "Whitefield",
+      "x": 584.0855211796352,
+      "y": 182.4525394733542
+    },
+    {
+      "id": 4,
+      "name": "HSR Layout",
+      "x": 815.6754944858401,
+      "y": 128.01679149642584
+    },
+    {
+      "id": 5,
+      "name": "Electronic City",
+      "x": 604.4715955412674,
+      "y": 234.07286885700577
+    },
+    {
+      "id": 6,
+      "name": "Jayanagar",
+      "x": 744.580616057301,
+      "y": 129.9871328641639
+    },
+    {
+      "id": 7,
+      "name": "Yeshwanthpur",
+      "x": 580.3925122156563,
+      "y": 467.75291254466424
+    },
+    {
+      "id": 8,
+      "name": "Marathahalli",
+      "x": 774.7264023778084,
+      "y": 529.1125794399983
+    },
+    {
+      "id": 9,
+      "name": "Hebbal",
+      "x": 628.235450433704,
+      "y": 91.18516715369796
+    },
+    {
+      "id": 10,
+      "name": "MG Road",
+      "x": 280.1870522956208,
+      "y": 317.745716135171
+    },
+    {
+      "id": 11,
+      "name": "Rajajinagar",
+      "x": 345.54954847765976,
+      "y": 300.1243733894768
+    },
+    {
+      "id": 12,
+      "name": "Bellandur",
+      "x": 717.0758221420538,
+      "y": 297.9382665096548
+    },
+    {
+      "id": 13,
+      "name": "Banashankari",
+      "x": 819.1419023045823,
+      "y": 495.954448918736
+    },
+    {
+      "id": 14,
+      "name": "Malleshwaram",
+      "x": 462.869251787481,
+      "y": 533.8168534868842
+    },
+    {
+      "id": 15,
+      "name": "Sarjapur",
+      "x": 654.4864547406164,
+      "y": 351.19616328840846
+    },
+    {
+      "id": 16,
+      "name": "Kalyan Nagar",
+      "x": 364.5753461621782,
+      "y": 600.9041051516181
+    },
+    {
+      "id": 17,
+      "name": "Domlur",
+      "x": 78.64926636891603,
+      "y": 79.45841905220261
+    },
+    {
+      "id": 18,
+      "name": "Banaswadi",
+      "x": 818.302508152755,
+      "y": 370.04274536988737
+    },
+    {
+      "id": 19,
+      "name": "JP Nagar",
+      "x": 884.8728185038691,
+      "y": 274.21526218444905
+    },
+    {
+      "id": 20,
+      "name": "BTM Layout",
+      "x": 197.94161900965128,
+      "y": 273.0009311002847
+    },
+    {
+      "id": 21,
+      "name": "Basavanagudi",
+      "x": 561.8264134263701,
+      "y": 420.08368352503595
+    },
+    {
+      "id": 22,
+      "name": "Ulsoor",
+      "x": 269.7714805511847,
+      "y": 130.220603566175
+    },
+    {
+      "id": 23,
+      "name": "KR Puram",
+      "x": 518.2655387683649,
+      "y": 331.32265126082643
+    },
+    {
+      "id": 24,
+      "name": "Hoodi",
+      "x": 303.29579162632945,
+      "y": 595.0428892593543
+    },
+    {
+      "id": 25,
+      "name": "Brookefield",
+      "x": 219.73788847206538,
+      "y": 126.76343656788026
+    },
+    {
+      "id": 26,
+      "name": "Vijayanagar",
+      "x": 769.2147130397335,
+      "y": 229.43870855121168
+    },
+    {
+      "id": 27,
+      "name": "Peenya",
+      "x": 716.9234137681666,
+      "y": 421.3497934898004
+    },
+    {
+      "id": 28,
+      "name": "Nagarbhavi",
+      "x": 446.9077759226732,
+      "y": 222.47215875229497
+    },
+    {
+      "id": 29,
+      "name": "RT Nagar",
+      "x": 538.2907792602942,
+      "y": 109.05850417721304
+    },
+    {
+      "id": 30,
+      "name": "Hennur",
+      "x": 169.2150027749061,
+      "y": 349.6008055239956
+    },
+    {
+      "id": 31,
+      "name": "Thanisandra",
+      "x": 157.92365652188147,
+      "y": 413.5727139641412
+    },
+    {
+      "id": 32,
+      "name": "Jakkur",
+      "x": 120.30910501098711,
+      "y": 493.77412664868524
+    },
+    {
+      "id": 33,
+      "name": "Yelahanka",
+      "x": 598.7810171870861,
+      "y": 603.9028233972742
+    },
+    {
+      "id": 34,
+      "name": "Devanahalli",
+      "x": 840.912026413091,
+      "y": 270.2545463133679
+    },
+    {
+      "id": 35,
+      "name": "Bommanahalli",
+      "x": 751.7723256883447,
+      "y": 548.6463626569324
+    },
+    {
+      "id": 36,
+      "name": "Begur",
+      "x": 551.4813973999194,
+      "y": 305.50359356006857
+    },
+    {
+      "id": 37,
+      "name": "Kanakapura Road",
+      "x": 543.826109824354,
+      "y": 402.61864932919224
+    },
+    {
+      "id": 38,
+      "name": "Hosur Road",
+      "x": 564.7479874480377,
+      "y": 169.29469646609553
+    },
+    {
+      "id": 39,
+      "name": "Frazer Town",
+      "x": 696.4810995683133,
+      "y": 506.3752311277141
+    },
+    {
+      "id": 40,
+      "name": "Shivajinagar",
+      "x": 539.8320892219804,
+      "y": 200.95210991454823
+    },
+    {
+      "id": 41,
+      "name": "Cunningham Road",
+      "x": 295.0680739734588,
+      "y": 153.19342620229253
+    },
+    {
+      "id": 42,
+      "name": "Richmond Town",
+      "x": 386.1119003407384,
+      "y": 371.71463202929993
+    },
+    {
+      "id": 43,
+      "name": "Varthur",
+      "x": 474.2425360151074,
+      "y": 475.4888791823323
+    },
+    {
+      "id": 44,
+      "name": "Kadugodi",
+      "x": 434.7070343457975,
+      "y": 144.6701326271796
+    }
+  ],
+  "trucks": [
+    {
+      "id": "TRK-999",
+      "plate": "KA 00 LR 9999",
+      "driver": "Test Driver",
+      "mobile": "9999999999",
+      "email": "test@logiroute.in",
+      "vehicleType": "Van",
+      "capacity": 500,
+      "fuel": 80,
+      "status": "Active",
+      "startNode": 0
+    },
+    {
+      "id": "TRK-939",
+      "plate": "KA 00 LR 9999",
+      "driver": "Test Driver",
+      "mobile": "9999999999",
+      "email": "test@logiroute.in",
+      "vehicleType": "Van",
+      "capacity": 500,
+      "fuel": 80,
+      "status": "Active",
+      "startNode": 0
+    },
+    {
+      "id": "TRK-980",
+      "plate": "KA 00 LR 9999",
+      "driver": "Test Driver",
+      "mobile": "9999999999",
+      "email": "test@logiroute.in",
+      "vehicleType": "Van",
+      "capacity": 500,
+      "fuel": 80,
+      "status": "Active",
+      "startNode": 0
+    },
+    {
+      "id": "TRK-728",
+      "plate": "KA 09 LR 7777",
+      "driver": "Wire Test",
+      "mobile": "9999999999",
+      "email": "wire@test.com",
+      "vehicleType": "Van",
+      "capacity": 500,
+      "fuel": 80,
+      "status": "Completed",
+      "startNode": 0
+    },
+    {
+      "id": "TRK-709",
+      "plate": "KA 09 LR 7777",
+      "driver": "Wire Test",
+      "mobile": "9999999999",
+      "email": "wire@test.com",
+      "vehicleType": "Van",
+      "capacity": 500,
+      "fuel": 80,
+      "status": "Completed",
+      "startNode": 0
+    },
+    {
+      "id": "TRK-101",
+      "plate": "KA 28 LR 7589",
+      "driver": "Sravan",
+      "mobile": "8889996632",
+      "email": "test@logiroute.com",
+      "vehicleType": "Mini Truck",
+      "capacity": 500,
+      "fuel": 85,
+      "status": "Completed",
+      "startNode": 0
+    }
+  ],
+  "packages": [
+    {
+      "id": "LR24000",
+      "merchant": "Flipkart",
+      "recipient": "Nisha Rao",
+      "email": "nisha@example.com",
+      "phone": "9872469604",
+      "node": 41,
+      "destination": "Cunningham Road",
+      "weight": 78,
+      "volume": 36,
+      "priority": "Normal",
+      "deadline": "12:03 pm",
+      "status": "In Transit",
+      "eta": "11:42 am",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24001",
+      "merchant": "Nykaa",
+      "recipient": "Vikram S",
+      "email": "vikram@example.com",
+      "phone": "9856547974",
+      "node": 23,
+      "destination": "KR Puram",
+      "weight": 10,
+      "volume": 41,
+      "priority": "Normal",
+      "deadline": "01:25 pm",
+      "status": "In Transit",
+      "eta": "02:18 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24002",
+      "merchant": "Myntra",
+      "recipient": "Ananya P",
+      "email": "ananya@example.com",
+      "phone": "9843422596",
+      "node": 33,
+      "destination": "Yelahanka",
+      "weight": 35,
+      "volume": 9,
+      "priority": "Normal",
+      "deadline": "04:34 pm",
+      "status": "In Transit",
+      "eta": "01:00 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24003",
+      "merchant": "Tata Cliq",
+      "recipient": "Sahil M",
+      "email": "sahil@example.com",
+      "phone": "9855466712",
+      "node": 40,
+      "destination": "Shivajinagar",
+      "weight": 66,
+      "volume": 50,
+      "priority": "Normal",
+      "deadline": "04:33 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24004",
+      "merchant": "Croma",
+      "recipient": "Priya K",
+      "email": "priya@example.com",
+      "phone": "9894543464",
+      "node": 11,
+      "destination": "Rajajinagar",
+      "weight": 13,
+      "volume": 37,
+      "priority": "Urgent",
+      "deadline": "12:32 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24005",
+      "merchant": "Ajio",
+      "recipient": "Dev Shah",
+      "email": "dev@example.com",
+      "phone": "9827886686",
+      "node": 40,
+      "destination": "Shivajinagar",
+      "weight": 39,
+      "volume": 37,
+      "priority": "Urgent",
+      "deadline": "02:31 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24006",
+      "merchant": "Tata Cliq",
+      "recipient": "Nisha Rao",
+      "email": "nisha@example.com",
+      "phone": "9847759726",
+      "node": 15,
+      "destination": "Sarjapur",
+      "weight": 33,
+      "volume": 30,
+      "priority": "Normal",
+      "deadline": "12:43 pm",
+      "status": "In Transit",
+      "eta": "01:26 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24007",
+      "merchant": "Ajio",
+      "recipient": "Vikram S",
+      "email": "vikram@example.com",
+      "phone": "9833044333",
+      "node": 21,
+      "destination": "Basavanagudi",
+      "weight": 43,
+      "volume": 11,
+      "priority": "Normal",
+      "deadline": "04:56 pm",
+      "status": "In Transit",
+      "eta": "12:34 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24008",
+      "merchant": "Ajio",
+      "recipient": "Ananya P",
+      "email": "ananya@example.com",
+      "phone": "9892196066",
+      "node": 42,
+      "destination": "Richmond Town",
+      "weight": 50,
+      "volume": 22,
+      "priority": "Normal",
+      "deadline": "03:37 pm",
+      "status": "In Transit",
+      "eta": "02:44 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24009",
+      "merchant": "Reliance Digital",
+      "recipient": "Sahil M",
+      "email": "sahil@example.com",
+      "phone": "9818966483",
+      "node": 16,
+      "destination": "Kalyan Nagar",
+      "weight": 24,
+      "volume": 23,
+      "priority": "Normal",
+      "deadline": "02:40 pm",
+      "status": "In Transit",
+      "eta": "12:08 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24010",
+      "merchant": "Local Retail Partner",
+      "recipient": "Priya K",
+      "email": "priya@example.com",
+      "phone": "9835706049",
+      "node": 34,
+      "destination": "Devanahalli",
+      "weight": 42,
+      "volume": 52,
+      "priority": "Normal",
+      "deadline": "12:29 pm",
+      "status": "In Transit",
+      "eta": "01:52 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24011",
+      "merchant": "Ajio",
+      "recipient": "Dev Shah",
+      "email": "dev@example.com",
+      "phone": "9895440356",
+      "node": 32,
+      "destination": "Jakkur",
+      "weight": 78,
+      "volume": 59,
+      "priority": "Normal",
+      "deadline": "12:54 pm",
+      "status": "In Transit",
+      "eta": "01:26 pm",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24012",
+      "merchant": "Croma",
+      "recipient": "Nisha Rao",
+      "email": "nisha@example.com",
+      "phone": "9846893015",
+      "node": 37,
+      "destination": "Kanakapura Road",
+      "weight": 21,
+      "volume": 20,
+      "priority": "Urgent",
+      "deadline": "12:50 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24013",
+      "merchant": "Flipkart",
+      "recipient": "Vikram S",
+      "email": "vikram@example.com",
+      "phone": "9829500065",
+      "node": 35,
+      "destination": "Bommanahalli",
+      "weight": 75,
+      "volume": 11,
+      "priority": "Urgent",
+      "deadline": "03:11 pm",
+      "status": "In Transit",
+      "eta": "01:26 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24014",
+      "merchant": "Reliance Digital",
+      "recipient": "Ananya P",
+      "email": "ananya@example.com",
+      "phone": "9845767760",
+      "node": 5,
+      "destination": "Electronic City",
+      "weight": 80,
+      "volume": 45,
+      "priority": "Normal",
+      "deadline": "04:26 pm",
+      "status": "In Transit",
+      "eta": "12:34 pm",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24015",
+      "merchant": "Local Retail Partner",
+      "recipient": "Sahil M",
+      "email": "sahil@example.com",
+      "phone": "9868877512",
+      "node": 15,
+      "destination": "Sarjapur",
+      "weight": 73,
+      "volume": 12,
+      "priority": "Urgent",
+      "deadline": "02:25 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [
+        "LR24012"
+      ],
+      "instructions": ""
+    },
+    {
+      "id": "LR24016",
+      "merchant": "Swiggy Instamart",
+      "recipient": "Priya K",
+      "email": "priya@example.com",
+      "phone": "9895900935",
+      "node": 1,
+      "destination": "Koramangala",
+      "weight": 45,
+      "volume": 33,
+      "priority": "Normal",
+      "deadline": "04:27 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24017",
+      "merchant": "BigBasket",
+      "recipient": "Dev Shah",
+      "email": "dev@example.com",
+      "phone": "9855392505",
+      "node": 43,
+      "destination": "Varthur",
+      "weight": 41,
+      "volume": 15,
+      "priority": "Urgent",
+      "deadline": "02:08 pm",
+      "status": "In Transit",
+      "eta": "12:34 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [
+        "LR24010"
+      ],
+      "instructions": ""
+    },
+    {
+      "id": "LR24018",
+      "merchant": "Myntra",
+      "recipient": "Nisha Rao",
+      "email": "nisha@example.com",
+      "phone": "9844417644",
+      "node": 12,
+      "destination": "Bellandur",
+      "weight": 37,
+      "volume": 64,
+      "priority": "Normal",
+      "deadline": "01:36 pm",
+      "status": "In Transit",
+      "eta": "01:52 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24019",
+      "merchant": "Reliance Digital",
+      "recipient": "Vikram S",
+      "email": "vikram@example.com",
+      "phone": "9819069527",
+      "node": 37,
+      "destination": "Kanakapura Road",
+      "weight": 42,
+      "volume": 13,
+      "priority": "Normal",
+      "deadline": "02:53 pm",
+      "status": "In Transit",
+      "eta": "01:00 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24020",
+      "merchant": "Local Retail Partner",
+      "recipient": "Ananya P",
+      "email": "ananya@example.com",
+      "phone": "9883418433",
+      "node": 8,
+      "destination": "Marathahalli",
+      "weight": 70,
+      "volume": 9,
+      "priority": "Normal",
+      "deadline": "01:27 pm",
+      "status": "In Transit",
+      "eta": "01:00 pm",
+      "truckId": "TRK-980",
+      "dependsOn": [
+        "LR24003"
+      ],
+      "instructions": ""
+    },
+    {
+      "id": "LR24021",
+      "merchant": "Amazon",
+      "recipient": "Sahil M",
+      "email": "sahil@example.com",
+      "phone": "9888586210",
+      "node": 14,
+      "destination": "Malleshwaram",
+      "weight": 60,
+      "volume": 58,
+      "priority": "Normal",
+      "deadline": "02:55 pm",
+      "status": "In Transit",
+      "eta": "12:08 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24022",
+      "merchant": "Nykaa",
+      "recipient": "Priya K",
+      "email": "priya@example.com",
+      "phone": "9878168244",
+      "node": 24,
+      "destination": "Hoodi",
+      "weight": 25,
+      "volume": 21,
+      "priority": "Normal",
+      "deadline": "05:21 pm",
+      "status": "In Transit",
+      "eta": "11:42 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24023",
+      "merchant": "Meesho",
+      "recipient": "Dev Shah",
+      "email": "dev@example.com",
+      "phone": "9892042598",
+      "node": 30,
+      "destination": "Hennur",
+      "weight": 77,
+      "volume": 8,
+      "priority": "Normal",
+      "deadline": "05:22 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24024",
+      "merchant": "Blinkit",
+      "recipient": "Nisha Rao",
+      "email": "nisha@example.com",
+      "phone": "9886001466",
+      "node": 31,
+      "destination": "Thanisandra",
+      "weight": 54,
+      "volume": 34,
+      "priority": "Normal",
+      "deadline": "12:23 pm",
+      "status": "In Transit",
+      "eta": "11:42 am",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24025",
+      "merchant": "Croma",
+      "recipient": "Vikram S",
+      "email": "vikram@example.com",
+      "phone": "9858814975",
+      "node": 41,
+      "destination": "Cunningham Road",
+      "weight": 77,
+      "volume": 8,
+      "priority": "Normal",
+      "deadline": "05:35 pm",
+      "status": "In Transit",
+      "eta": "11:42 am",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24026",
+      "merchant": "Ajio",
+      "recipient": "Ananya P",
+      "email": "ananya@example.com",
+      "phone": "9849808140",
+      "node": 5,
+      "destination": "Electronic City",
+      "weight": 32,
+      "volume": 11,
+      "priority": "Normal",
+      "deadline": "12:48 pm",
+      "status": "In Transit",
+      "eta": "02:44 pm",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24027",
+      "merchant": "Croma",
+      "recipient": "Sahil M",
+      "email": "sahil@example.com",
+      "phone": "9888582393",
+      "node": 2,
+      "destination": "Indiranagar",
+      "weight": 33,
+      "volume": 58,
+      "priority": "Normal",
+      "deadline": "12:34 pm",
+      "status": "In Transit",
+      "eta": "02:18 pm",
+      "truckId": "TRK-939",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24028",
+      "merchant": "Ajio",
+      "recipient": "Priya K",
+      "email": "priya@example.com",
+      "phone": "9861957129",
+      "node": 38,
+      "destination": "Hosur Road",
+      "weight": 52,
+      "volume": 34,
+      "priority": "Normal",
+      "deadline": "02:08 pm",
+      "status": "In Transit",
+      "eta": "12:08 pm",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR24029",
+      "merchant": "Ajio",
+      "recipient": "Dev Shah",
+      "email": "dev@example.com",
+      "phone": "9824244821",
+      "node": 25,
+      "destination": "Brookefield",
+      "weight": 39,
+      "volume": 56,
+      "priority": "Normal",
+      "deadline": "01:45 pm",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-980",
+      "dependsOn": [],
+      "instructions": ""
+    },
+    {
+      "id": "LR99999",
+      "merchant": "Amazon",
+      "recipient": "Test Customer",
+      "email": "customer@logiroute.in",
+      "phone": "9876503333",
+      "node": 1,
+      "destination": "Koramangala",
+      "weight": 10,
+      "volume": 5,
+      "priority": "Normal",
+      "deadline": "10:30",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": "Leave at gate"
+    },
+    {
+      "id": "LR99360",
+      "merchant": "Amazon",
+      "recipient": "Test Customer",
+      "email": "customer@logiroute.in",
+      "phone": "9876503333",
+      "node": 1,
+      "destination": "Koramangala",
+      "weight": 10,
+      "volume": 5,
+      "priority": "Normal",
+      "deadline": "10:30",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": "Leave at gate"
+    },
+    {
+      "id": "LR92275",
+      "merchant": "Amazon",
+      "recipient": "Test Customer",
+      "email": "customer@logiroute.in",
+      "phone": "9876503333",
+      "node": 1,
+      "destination": "Koramangala",
+      "weight": 10,
+      "volume": 5,
+      "priority": "Normal",
+      "deadline": "10:30",
+      "status": "In Transit",
+      "eta": "11:16 am",
+      "truckId": "TRK-999",
+      "dependsOn": [],
+      "instructions": "Leave at gate"
+    }
+  ],
+  "incidents": [
+    {
+      "id": "INC-E538BF34FFC8E2",
+      "truckId": "",
+      "type": "Delay",
+      "message": "Write test incident",
+      "createdAt": "2026-05-29T04:30:49.058Z",
+      "resolved": false,
+      "resolvedAt": ""
+    },
+    {
+      "id": "INC-3AD5E1032EAFBD",
+      "truckId": "",
+      "type": "Accident",
+      "message": "UI accident test",
+      "createdAt": "2026-05-27T06:45:50.653Z",
+      "resolved": false,
+      "resolvedAt": ""
+    },
+    {
+      "id": "INC-940712562BBE05",
+      "truckId": "TRK-709",
+      "type": "Truck Stationary",
+      "message": "TRK-709 has been stationary too long",
+      "createdAt": "2026-05-27T06:42:37.701Z",
+      "resolved": false,
+      "resolvedAt": ""
+    },
+    {
+      "id": "INC-593496482B8354",
+      "truckId": "",
+      "type": "Delayed Package",
+      "message": "LR24012 may miss its delivery window",
+      "createdAt": "2026-05-27T06:42:22.676Z",
+      "resolved": true,
+      "resolvedAt": "2026-05-27T06:43:07.712Z"
+    },
+    {
+      "id": "INC-BC85F609234AD6",
+      "truckId": "TRK-980",
+      "type": "Delay",
+      "message": "Smoke test incident",
+      "createdAt": "2026-05-27T06:33:23.926Z",
+      "resolved": true,
+      "resolvedAt": "2026-05-27T06:33:23.938Z"
+    },
+    {
+      "id": "INC-C6A9230122DC72",
+      "truckId": "TRK-939",
+      "type": "Delay",
+      "message": "Smoke test incident",
+      "createdAt": "2026-05-27T06:32:55.666Z",
+      "resolved": true,
+      "resolvedAt": "2026-05-27T06:32:55.728Z"
+    },
+    {
+      "id": "INC-7E88B2041E6D91",
+      "truckId": "TRK-999",
+      "type": "Delay",
+      "message": "Smoke test incident",
+      "createdAt": "2026-05-27T06:28:05.138Z",
+      "resolved": true,
+      "resolvedAt": "2026-05-27T06:28:05.197Z"
+    }
+  ]
+}

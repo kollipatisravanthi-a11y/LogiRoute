@@ -109,3 +109,34 @@ function branchBoundTsp(stops, matrix) {
   visit([0], unique, 0);
   return best;
 }
+
+// Brute-force TSP for small sets of stops.
+// Used only for visualization/comparison (factorial growth!).
+function bruteForceTsp(stops, matrix, { maxNodes = 8 } = {}) {
+  const unique = [...new Set(stops)].filter(node => node !== 0);
+  const nodes = unique.slice(0, Math.max(0, Math.floor(maxNodes)));
+  if (!nodes.length) return [0, 0];
+
+  let best = [0].concat(nodes).concat(0);
+  let bestCost = routeDistance(best, matrix);
+
+  function visit(path, remaining, cost) {
+    if (!remaining.length) {
+      const total = cost + matrix[path[path.length - 1]][0];
+      if (total < bestCost) {
+        bestCost = total;
+        best = path.concat(0);
+      }
+      return;
+    }
+    const current = path[path.length - 1];
+    for (let i = 0; i < remaining.length; i++) {
+      const node = remaining[i];
+      const nextRemaining = remaining.slice(0, i).concat(remaining.slice(i + 1));
+      visit(path.concat(node), nextRemaining, cost + matrix[current][node]);
+    }
+  }
+
+  visit([0], nodes, 0);
+  return best;
+}

@@ -33,7 +33,7 @@ function renderTracking() {
       <main class="customer-main">
         <section class="card eta-card">
           <div><h2>${truck ? `Arriving by ${pkg.eta}` : "Waiting for dispatch"}</h2><p>${truck ? `Your delivery is stop ${stopNumber} on ${truck.id}.` : "The owner has not assigned this package to a vehicle yet."}</p><p id="distanceText">${truck ? `Driver is ${customerDistance(pkg, truck)} km away.` : "You will get an email/SMS notification after assignment."}</p></div>
-          <button class="btn primary" onclick="routeTo('confirmation')">Delivery Complete</button>
+          <button class="btn primary" onclick="completeDelivery()">Delivery Complete</button>
         </section>
         <div class="tracking-grid">
           <section class="card customer-map"><canvas id="customerMap"></canvas></section>
@@ -50,8 +50,9 @@ function renderTracking() {
 }
 
 function driverInfo(truck, pkg) {
-  if (!truck) return `<b>Driver pending</b><p class="muted">Driver and truck details appear here after the owner assigns a vehicle.</p><textarea class="textarea" placeholder="Leave delivery instructions">${pkg.instructions}</textarea>`;
-  return `<div class="driver-top"><div class="avatar">${truck.driver[0]}</div><div><b>${truck.driver.split(" ")[0]}</b><div class="muted">${truck.plate} - ${truck.vehicleType}</div></div></div><p class="muted">${truck.mobile} - ${truck.email}</p><button class="btn primary">Contact Driver</button><textarea class="textarea" placeholder="Leave delivery instructions">${pkg.instructions}</textarea>`;
+  const instructions = `<textarea class="textarea" placeholder="Leave delivery instructions" onblur="updateDeliveryInstructions('${pkg.id}', this.value)">${pkg.instructions || ""}</textarea>`;
+  if (!truck) return `<b>Driver pending</b><p class="muted">Driver and truck details appear here after the owner assigns a vehicle.</p>${instructions}`;
+  return `<div class="driver-top"><div class="avatar">${truck.driver[0]}</div><div><b>${truck.driver.split(" ")[0]}</b><div class="muted">${truck.plate} - ${truck.vehicleType}</div></div></div><p class="muted">${truck.mobile} - ${truck.email}</p><button class="btn primary">Contact Driver</button>${instructions}`;
 }
 
 function timeline(pkg) {
@@ -70,7 +71,7 @@ function renderAccount() {
 
 function renderConfirmation() {
   const pkg = currentCustomerPackage();
-  pkg.status = "Delivered";
+
   app.innerHTML = `
     <section class="app-shell">${topbar("customer")}
       <main class="customer-main" style="display:grid;place-items:center;min-height:calc(100vh - 66px)">
@@ -82,5 +83,41 @@ function renderConfirmation() {
         </section>
       </main>
     </section>`;
+}
+
+async function completeDelivery() {
+  const pkg = currentCustomerPackage();
+  if (!pkg) return;
+
+  pkg.status = "Delivered";
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      await apiJson(`/api/packages/${encodeURIComponent(pkg.id)}`, { method: "PATCH", body: { status: "Delivered" } });
+      await refreshFromBackend();
+    } catch (e) {
+      notify(e?.message || "Failed to update delivery status", "error");
+      return;
+    }
+  }
+
+  routeTo("confirmation");
+}
+
+async function updateDeliveryInstructions(packageId, instructions) {
+  const pkg = state.packages.find(item => item.id === packageId);
+  if (!pkg) return;
+
+  const next = String(instructions || "").trim();
+  if ((pkg.instructions || "") === next) return;
+  pkg.instructions = next;
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      await apiJson(`/api/packages/${encodeURIComponent(packageId)}`, { method: "PATCH", body: { instructions: next } });
+      notify("Delivery instructions saved.", "success");
+    } catch (e) {
+      notify(e?.message || "Failed to save instructions", "error");
+    }
+  }
 }
 
