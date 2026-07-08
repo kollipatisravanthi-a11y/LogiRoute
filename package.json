@@ -1,0 +1,11 @@
+{
+  "name": "logiroute",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix backend run dev",
+    "dev:owner": "npm --prefix backend run dev:owner",
+    "start": "npm --prefix backend run start",
+    "start:owner": "npm --prefix backend run start:owner",
+    "test": "npm --prefix backend test"
+  }
+}
