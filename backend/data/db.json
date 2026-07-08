@@ -3,7 +3,7 @@
     "version": 1,
     "createdAt": "2026-05-08T06:01:50.963Z",
     "seededAt": "2026-05-08T06:01:51.034Z",
-    "updatedAt": "2026-06-11T14:21:13.535Z"
+    "updatedAt": "2026-07-08T14:19:12.237Z"
   },
   "users": [
     {
@@ -310,7 +310,7 @@
       "vehicleType": "Van",
       "capacity": 500,
       "fuel": 80,
-      "status": "Active",
+      "status": "Completed",
       "startNode": 0
     },
     {
@@ -322,7 +322,7 @@
       "vehicleType": "Van",
       "capacity": 500,
       "fuel": 80,
-      "status": "Active",
+      "status": "Completed",
       "startNode": 0
     },
     {
@@ -334,7 +334,7 @@
       "vehicleType": "Van",
       "capacity": 500,
       "fuel": 80,
-      "status": "Active",
+      "status": "Completed",
       "startNode": 0
     },
     {
@@ -514,7 +514,7 @@
       "priority": "Normal",
       "deadline": "04:56 pm",
       "status": "In Transit",
-      "eta": "12:34 pm",
+      "eta": "01:00 pm",
       "truckId": "TRK-939",
       "dependsOn": [],
       "instructions": ""
@@ -535,7 +535,9 @@
       "eta": "02:44 pm",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24009",
@@ -734,10 +736,12 @@
       "priority": "Normal",
       "deadline": "02:53 pm",
       "status": "In Transit",
-      "eta": "01:00 pm",
+      "eta": "12:34 pm",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24020",
@@ -775,7 +779,9 @@
       "eta": "12:08 pm",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24022",
@@ -811,7 +817,9 @@
       "eta": "11:16 am",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24024",
@@ -829,7 +837,9 @@
       "eta": "11:42 am",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24025",
@@ -883,7 +893,9 @@
       "eta": "02:18 pm",
       "truckId": "TRK-939",
       "dependsOn": [],
-      "instructions": ""
+      "instructions": "",
+      "lat": null,
+      "lng": null
     },
     {
       "id": "LR24028",

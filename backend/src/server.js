@@ -61,6 +61,172 @@ function makeId(prefix = "ID") {
   return `${prefix}-${Math.random().toString(16).slice(2, 10)}${Date.now().toString(16).slice(-6)}`.toUpperCase();
 }
 
+const BLR_CENTER = {
+  lat: asNumber(process.env.LR_BLR_CENTER_LAT, 13.1986),
+  lng: asNumber(process.env.LR_BLR_CENTER_LNG, 77.7066)
+};
+const BLR_RADIUS_KM = asNumber(process.env.LR_BLR_RADIUS_KM, 45);
+const KNOWN_BLR_COORDINATES = new Map([
+  ["central warehouse", { lat: 13.1986, lng: 77.7066 }],
+  ["koramangala", { lat: 12.9352, lng: 77.6245 }],
+  ["indiranagar", { lat: 12.9784, lng: 77.6408 }],
+  ["whitefield", { lat: 12.9698, lng: 77.7500 }],
+  ["hsr layout", { lat: 12.9116, lng: 77.6474 }],
+  ["electronic city", { lat: 12.8452, lng: 77.6602 }],
+  ["jayanagar", { lat: 12.9250, lng: 77.5938 }],
+  ["marathahalli", { lat: 12.9569, lng: 77.7011 }],
+  ["hebbal", { lat: 13.0358, lng: 77.5970 }],
+  ["yelahanka", { lat: 13.1007, lng: 77.5963 }],
+  ["banashankari", { lat: 12.9255, lng: 77.5468 }]
+]);
+
+function hasOwn(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj || {}, key);
+}
+
+function normalizeDestination(value) {
+  return asString(value).trim().toLowerCase();
+}
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const toRad = n => (n * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function projectLatLngToCanvas(lat, lng) {
+  const x = 500 + (lng - BLR_CENTER.lng) * 500;
+  const y = 320 - (lat - BLR_CENTER.lat) * 500;
+  return {
+    x: clamp(Math.round(x), 40, 960),
+    y: clamp(Math.round(y), 40, 640)
+  };
+}
+
+function projectCanvasToLatLng(x, y) {
+  return {
+    lat: BLR_CENTER.lat + (320 - y) / 500,
+    lng: BLR_CENTER.lng + (x - 500) / 500
+  };
+}
+
+function normalizeWords(value) {
+  return normalizeDestination(value)
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function scoreNameMatch(query, candidate) {
+  if (!query || !candidate) return 0;
+  if (query === candidate) return 1;
+  if (candidate.includes(query) || query.includes(candidate)) return 0.9;
+
+  const q = query.split(" ").filter(Boolean);
+  const c = candidate.split(" ").filter(Boolean);
+  if (!q.length || !c.length) return 0;
+
+  let overlap = 0;
+  for (const token of q) {
+    if (c.some(t => t.startsWith(token) || token.startsWith(t))) overlap += 1;
+  }
+  return overlap / Math.max(q.length, c.length);
+}
+
+function findBestNodeMatch(nodes, inputName) {
+  const query = normalizeWords(inputName);
+  let best = null;
+  let score = 0;
+
+  for (const node of nodes || []) {
+    const candidate = normalizeWords(node?.name);
+    const s = scoreNameMatch(query, candidate);
+    if (s > score) {
+      score = s;
+      best = node;
+    }
+  }
+  if (!best || score < 0.45) return null;
+  return { node: best, score };
+}
+
+function knownBlrCoordinatesFor(name) {
+  const normalized = normalizeWords(name);
+  for (const [location, coordinates] of KNOWN_BLR_COORDINATES) {
+    if (normalized === location || normalized.includes(location) || location.includes(normalized)) {
+      return coordinates;
+    }
+  }
+  return null;
+}
+
+function resolveAndValidateDestination(db, payload, currentPkg) {
+  const nodes = Array.isArray(db?.nodes) ? db.nodes : [];
+  const byName = new Map(nodes.map((n, i) => [normalizeDestination(n?.name), i]));
+
+  let node = hasOwn(payload, "node") ? asNumber(payload.node, NaN) : Number(currentPkg?.node);
+  let destination = hasOwn(payload, "destination")
+    ? asString(payload.destination).trim()
+    : asString(currentPkg?.destination).trim();
+
+  if (!Number.isFinite(node) && destination) {
+    const indexByName = byName.get(normalizeDestination(destination));
+    if (Number.isFinite(indexByName)) node = indexByName;
+  }
+
+  if (!Number.isFinite(node)) {
+    throw Object.assign(new Error("Destination node is required and must be serviceable"), { status: 400 });
+  }
+
+  const nodeIndex = Math.floor(node);
+  if (nodeIndex < 0 || nodeIndex >= nodes.length) {
+    throw Object.assign(new Error("Destination is not serviceable currently"), { status: 400 });
+  }
+
+  const selectedNode = nodes[nodeIndex];
+  if (!selectedNode?.name) {
+    throw Object.assign(new Error("Destination is not serviceable currently"), { status: 400 });
+  }
+
+  if (!destination) {
+    destination = selectedNode.name;
+  }
+
+  const destinationIndex = byName.get(normalizeDestination(destination));
+  if (Number.isFinite(destinationIndex) && destinationIndex !== nodeIndex) {
+    throw Object.assign(new Error("Destination and node do not match"), { status: 400 });
+  }
+  if (!Number.isFinite(destinationIndex)) {
+    throw Object.assign(new Error("Destination is not serviceable currently"), { status: 400 });
+  }
+
+  const lat = hasOwn(payload, "lat") ? asNumber(payload.lat, NaN) : Number(currentPkg?.lat);
+  const lng = hasOwn(payload, "lng") ? asNumber(payload.lng, NaN) : Number(currentPkg?.lng);
+  const hasGeo = Number.isFinite(lat) && Number.isFinite(lng);
+
+  if (hasGeo) {
+    const distanceKm = haversineKm(lat, lng, BLR_CENTER.lat, BLR_CENTER.lng);
+    if (distanceKm > BLR_RADIUS_KM) {
+      throw Object.assign(new Error(`Destination is outside BLR service radius (${BLR_RADIUS_KM} km)`), { status: 400 });
+    }
+  }
+
+  return {
+    node: nodeIndex,
+    destination: selectedNode.name,
+    lat: hasGeo ? lat : null,
+    lng: hasGeo ? lng : null
+  };
+}
+
 function normalizeRole(value) {
   const role = asString(value).trim().toLowerCase();
   return role === "owner" ? "owner" : "customer";
@@ -127,6 +293,71 @@ app.get("/api/nodes", async (req, res, next) => {
   try {
     const db = await getDb();
     res.json(db.nodes);
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.post("/api/nodes", async (req, res, next) => {
+  try {
+    const payload = req.body ?? {};
+    const name = asString(payload.name).trim();
+    if (!isNonEmptyString(name)) return badRequest(res, "Node name is required");
+
+    let createdNode = null;
+    await updateDb(async db0 => {
+      const exists = db0.nodes.some(n => normalizeDestination(n?.name) === normalizeDestination(name));
+      if (exists) throw Object.assign(new Error("NODE_EXISTS"), { status: 409 });
+
+      let lat = asNumber(payload.lat, NaN);
+      let lng = asNumber(payload.lng, NaN);
+      const hasGeo = Number.isFinite(lat) && Number.isFinite(lng);
+
+      if (!hasGeo) {
+        const best = findBestNodeMatch(db0.nodes, name);
+        if (!best) {
+          throw Object.assign(new Error("Location could not be identified in BLR network"), { status: 400 });
+        }
+
+        const inferred = best.node;
+        const knownCoordinates = knownBlrCoordinatesFor(inferred.name);
+        if (knownCoordinates) {
+          lat = knownCoordinates.lat;
+          lng = knownCoordinates.lng;
+        } else if (Number.isFinite(Number(inferred.lat)) && Number.isFinite(Number(inferred.lng))) {
+          lat = Number(inferred.lat);
+          lng = Number(inferred.lng);
+        } else {
+          const fromCanvas = projectCanvasToLatLng(
+            asNumber(inferred.x, 500),
+            asNumber(inferred.y, 320)
+          );
+          lat = fromCanvas.lat;
+          lng = fromCanvas.lng;
+        }
+      }
+
+      const distanceKm = haversineKm(lat, lng, BLR_CENTER.lat, BLR_CENTER.lng);
+      if (distanceKm > BLR_RADIUS_KM) {
+        throw Object.assign(new Error(`Location is outside BLR service radius (${BLR_RADIUS_KM} km)`), { status: 400 });
+      }
+
+      const projected = projectLatLngToCanvas(lat, lng);
+      const x = hasOwn(payload, "x") ? asNumber(payload.x, projected.x) : projected.x;
+      const y = hasOwn(payload, "y") ? asNumber(payload.y, projected.y) : projected.y;
+
+      createdNode = {
+        id: db0.nodes.length,
+        name,
+        x: clamp(Math.round(x), 40, 960),
+        y: clamp(Math.round(y), 40, 640),
+        lat,
+        lng
+      };
+      db0.nodes.push(createdNode);
+    });
+
+    return res.status(201).json(createdNode);
   } catch (e) {
     next(e);
   }
@@ -260,30 +491,34 @@ app.post("/api/packages", async (req, res, next) => {
     const payload = req.body ?? {};
     const id = asString(payload.id).trim();
     if (!isNonEmptyString(id)) return badRequest(res, "Package id is required");
-
-    const pkg = {
-      id,
-      merchant: asString(payload.merchant).trim(),
-      recipient: asString(payload.recipient).trim(),
-      email: asString(payload.email).trim(),
-      phone: asString(payload.phone).trim(),
-      node: asNumber(payload.node, 1),
-      destination: asString(payload.destination).trim(),
-      weight: asNumber(payload.weight, 1),
-      volume: asNumber(payload.volume, 1),
-      priority: asString(payload.priority).trim() || "Normal",
-      deadline: asString(payload.deadline).trim(),
-      status: asString(payload.status).trim() || "Pending",
-      eta: asString(payload.eta).trim(),
-      truckId: asString(payload.truckId).trim(),
-      dependsOn: Array.isArray(payload.dependsOn) ? payload.dependsOn : [],
-      instructions: asString(payload.instructions).trim()
-    };
+    let pkg = null;
 
     const db = await updateDb(async db0 => {
       if (db0.packages.some(p => p.id.toLowerCase() === id.toLowerCase())) {
         throw Object.assign(new Error("PACKAGE_EXISTS"), { status: 409 });
       }
+
+      const destination = resolveAndValidateDestination(db0, payload, null);
+      pkg = {
+        id,
+        merchant: asString(payload.merchant).trim(),
+        recipient: asString(payload.recipient).trim(),
+        email: asString(payload.email).trim(),
+        phone: asString(payload.phone).trim(),
+        node: destination.node,
+        destination: destination.destination,
+        lat: destination.lat,
+        lng: destination.lng,
+        weight: asNumber(payload.weight, 1),
+        volume: asNumber(payload.volume, 1),
+        priority: asString(payload.priority).trim() || "Normal",
+        deadline: asString(payload.deadline).trim(),
+        status: asString(payload.status).trim() || "Pending",
+        eta: asString(payload.eta).trim(),
+        truckId: asString(payload.truckId).trim(),
+        dependsOn: Array.isArray(payload.dependsOn) ? payload.dependsOn : [],
+        instructions: asString(payload.instructions).trim()
+      };
       db0.packages.push(pkg);
     });
 
@@ -301,7 +536,7 @@ app.patch("/api/packages/bulk", async (req, res, next) => {
 
     const allowed = [
       "merchant", "recipient", "email", "phone", "node", "destination", "weight", "volume",
-      "priority", "deadline", "status", "eta", "truckId", "dependsOn", "instructions"
+      "priority", "deadline", "status", "eta", "truckId", "dependsOn", "instructions", "lat", "lng"
     ];
     const changed = [];
 
@@ -314,6 +549,11 @@ app.patch("/api/packages/bulk", async (req, res, next) => {
         if (!pkg) throw Object.assign(new Error("PACKAGE_NOT_FOUND"), { status: 404 });
 
         Object.assign(pkg, pick(item, allowed));
+        const destination = resolveAndValidateDestination(db0, pkg, pkg);
+        pkg.node = destination.node;
+        pkg.destination = destination.destination;
+        pkg.lat = destination.lat;
+        pkg.lng = destination.lng;
         if (pkg.node != null) pkg.node = asNumber(pkg.node, 1);
         if (pkg.weight != null) pkg.weight = asNumber(pkg.weight, 1);
         if (pkg.volume != null) pkg.volume = asNumber(pkg.volume, 1);
@@ -354,8 +594,14 @@ app.patch("/api/packages/:id", async (req, res, next) => {
 
       Object.assign(pkg, pick(update, [
         "merchant", "recipient", "email", "phone", "node", "destination", "weight", "volume",
-        "priority", "deadline", "status", "eta", "truckId", "dependsOn", "instructions"
+        "priority", "deadline", "status", "eta", "truckId", "dependsOn", "instructions", "lat", "lng"
       ]));
+
+      const destination = resolveAndValidateDestination(db0, pkg, pkg);
+      pkg.node = destination.node;
+      pkg.destination = destination.destination;
+      pkg.lat = destination.lat;
+      pkg.lng = destination.lng;
 
       if (pkg.node != null) pkg.node = asNumber(pkg.node, 1);
       if (pkg.weight != null) pkg.weight = asNumber(pkg.weight, 1);

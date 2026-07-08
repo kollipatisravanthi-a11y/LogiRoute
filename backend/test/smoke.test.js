@@ -97,6 +97,81 @@ test("backend serves state, auth, and bulk package updates", async () => {
     assert.equal(pkg.status, "In Transit");
     assert.equal(pkg.truckId, "TRK-TEST");
     assert.equal(pkg.eta, "10:30 AM");
+
+    const badDestinationRes = await fetch(`${baseUrl}/api/packages`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${session.token}`
+      },
+      body: JSON.stringify({
+        id: "LR-INVALID-001",
+        recipient: "Demo User",
+        destination: "Mysuru"
+      })
+    });
+    assert.equal(badDestinationRes.status, 400);
+
+    const outsideBlrRes = await fetch(`${baseUrl}/api/packages`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${session.token}`
+      },
+      body: JSON.stringify({
+        id: "LR-INVALID-002",
+        recipient: "Demo User",
+        node: 1,
+        destination: "Koramangala",
+        lat: 12.9716,
+        lng: 80.2707
+      })
+    });
+    assert.equal(outsideBlrRes.status, 400);
+
+    const addNearNodeRes = await fetch(`${baseUrl}/api/nodes`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${session.token}`
+      },
+      body: JSON.stringify({
+        name: "Near BLR Test Node",
+        lat: 13.18,
+        lng: 77.69
+      })
+    });
+    assert.equal(addNearNodeRes.status, 201);
+    const createdNode = await addNearNodeRes.json();
+    assert.equal(createdNode.name, "Near BLR Test Node");
+
+    const addByNameOnlyRes = await fetch(`${baseUrl}/api/nodes`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${session.token}`
+      },
+      body: JSON.stringify({
+        name: "Koramangala East"
+      })
+    });
+    assert.equal(addByNameOnlyRes.status, 201);
+    const byNameNode = await addByNameOnlyRes.json();
+    assert.equal(byNameNode.name, "Koramangala East");
+
+    const addFarNodeRes = await fetch(`${baseUrl}/api/nodes`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${session.token}`
+      },
+      body: JSON.stringify({
+        name: "Far Test Node",
+        lat: 12.9716,
+        lng: 80.2707
+      })
+    });
+    assert.equal(addFarNodeRes.status, 400);
   } finally {
     await stopServer(child);
     await fs.rm(dbFile, { force: true });

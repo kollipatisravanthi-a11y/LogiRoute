@@ -207,6 +207,17 @@ function packagePage() {
           <label class="field">Volume L<input id="pkgVolume" required type="number" min="1" value="${editing ? editing.volume : 10}"></label>
           <label class="field">Priority<select id="pkgPriority"><option ${editing && editing.priority === "Normal" ? "selected" : ""}>Normal</option><option ${editing && editing.priority === "Urgent" ? "selected" : ""}>Urgent</option></select></label>
           <label class="field">Status<select id="pkgStatus"><option ${editing && editing.status === "Pending" ? "selected" : ""}>Pending</option><option ${editing && editing.status === "In Transit" ? "selected" : ""}>In Transit</option><option ${editing && editing.status === "Delivered" ? "selected" : ""}>Delivered</option><option ${editing && editing.status === "Failed" ? "selected" : ""}>Failed</option></select></label>
+          <div class="full card pad" style="margin-top:2px">
+            <div class="panel-title" style="padding:0 0 10px;border-bottom:0">
+              <h3 style="margin:0;font-size:14px">Add Particular Location</h3>
+              <span class="muted">Type name, app will identify it</span>
+            </div>
+            <div class="form-grid">
+              <label class="field full">Location Name<input id="manualLocationName" placeholder="Koramangala, HSR Layout, Whitefield"></label>
+              <div class="action-row full" style="align-items:end"><button type="button" class="btn" onclick="addManualLocation()">Identify / Add Location</button></div>
+            </div>
+            <div class="muted" style="font-size:12px;margin-top:8px">No lat/lng needed. If not identifiable in BLR network, request is rejected.</div>
+          </div>
           <label class="field full">Special Instructions<textarea id="pkgInstructions" class="textarea" placeholder="Leave at gate, call before arriving, fragile, etc.">${editing ? editing.instructions : ""}</textarea></label>
           <div class="action-row full"><button class="btn primary">${editing ? "Update Package" : "Add Package"}</button>${editing ? `<button type="button" class="btn" onclick="resetPackageForm()">Cancel Edit</button>` : ""}</div>
         </form>
@@ -285,6 +296,83 @@ async function savePackage(event) {
   else state.packages.push(payload);
   state.editingPackageId = null;
   runOptimization();
+}
+
+function normalizeLocationName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function scoreLocationMatch(query, candidate) {
+  if (!query || !candidate) return 0;
+  if (query === candidate) return 1;
+  if (candidate.includes(query) || query.includes(candidate)) return 0.9;
+
+  const qTokens = query.split(" ").filter(Boolean);
+  const cTokens = candidate.split(" ").filter(Boolean);
+  if (!qTokens.length || !cTokens.length) return 0;
+
+  let overlap = 0;
+  for (const token of qTokens) {
+    if (cTokens.some(ct => ct.startsWith(token) || token.startsWith(ct))) overlap += 1;
+  }
+  return overlap / Math.max(qTokens.length, cTokens.length);
+}
+
+function findBestNodeByName(inputName) {
+  const query = normalizeLocationName(inputName);
+  if (!query) return null;
+
+  let best = null;
+  let score = 0;
+  for (const node of state.nodes) {
+    const name = normalizeLocationName(node?.name);
+    const s = scoreLocationMatch(query, name);
+    if (s > score) {
+      score = s;
+      best = node;
+    }
+  }
+  return score >= 0.45 ? best : null;
+}
+
+async function addManualLocation() {
+  const name = (document.getElementById("manualLocationName")?.value || "").trim();
+
+  if (!name) {
+    notify("Enter a location name", "error");
+    return;
+  }
+
+  const localMatch = findBestNodeByName(name);
+  if (localMatch) {
+    const selectExisting = document.getElementById("pkgNode");
+    if (selectExisting) selectExisting.value = String(localMatch.id);
+    notify(`Identified location: ${localMatch.name}`, "success");
+    return;
+  }
+
+  if (state.backendConnected && typeof apiJson === "function") {
+    try {
+      const created = await apiJson("/api/nodes", {
+        method: "POST",
+        body: { name }
+      });
+      await refreshFromBackend();
+      const select = document.getElementById("pkgNode");
+      if (select) select.value = String(created.id);
+      notify("Location added and selected", "success");
+      return;
+    } catch (e) {
+      notify(e?.message || "Failed to add location", "error");
+      return;
+    }
+  }
+
+  notify("Could not identify this location locally. Connect backend to add it by name.", "error");
 }
 
 function editPackage(id) {
